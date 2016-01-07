@@ -1,0 +1,10 @@
+{
+  "name": "movies",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.6",
+    "components-font-awesome": "~4.5.0"
+  },
+  "private": true
+}

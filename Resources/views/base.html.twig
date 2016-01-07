@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {% block stylesheets %}{% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('assets/css/bundled.min.css') }}"/>
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <nav class="navbar navbar-default">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="{{ url('homepage') }}">Movies</a>
+              </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul class="nav navbar-nav">
+                <li><a href="{{ url('homepage') }}">{{ 'Homepage'|trans }}</a></li>
+                <li><a href="{{ url('movies') }}">{{ 'Movies'|trans }}</a></li>
+                <li><a href="{{ url('search') }}">{{ 'Search'|trans }}</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ 'Account'|trans }} <span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                      <li><a href="{{ url('login') }}">{{ 'Login'|trans }}</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container">
+          {% for alert in [ 'info', 'success', 'warning', 'danger'] %}
+              {% for message in app.session.getFlashBag.get(alert) %}
+                  <div class="alert alert-{{ alert }} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ message|trans }}
+                  </div>
+              {% endfor %}
+          {% endfor %}
+          {% block body %}{% endblock %}
+          <footer>
+              <div class="well well-lg">
+                  {% block footer %}{% endblock %}
+                <a href="mailto:quiteflame@gmail.com">quiteflame@gmail.com</a>
+            </div>
+          </footer>
+        </div>
+        <script type="text/javascript" src="{{ asset('assets/js/bundled.min.js') }}"></script>
+        {% block javascripts %}{% endblock %}
+  </body>
+</html>

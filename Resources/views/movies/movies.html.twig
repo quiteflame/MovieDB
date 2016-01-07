@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% for movie in result %}
+        <div class="row bottom-buffer">
+            <div class="col-sm-2 box">
+                <img class="img-responsive img-thumbnail" src="{{ movie.Poster == 'N/A' ? asset('assets/img/NA.png') : movie.Poster }}">
+            </div>
+            <div class="col-sm-10 box">
+                <div class="row">
+                    <div class="col-sm-12 box"><h1>{{ movie.Title }} ({{ movie.Year }}) - {{ movie.Runtime }}</h1></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 box"><strong>Rated:</strong></div>
+                    <div class="col-sm-11 box">{{ movie.Rated }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 box"><strong>Genre:</strong></div>
+                    <div class="col-sm-11 box">{{ movie.Genre }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 box"><strong>Director:</strong></div>
+                    <div class="col-sm-11 box">{{ movie.Director }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 box"><strong>Rating:</strong></div>
+                    <div class="col-sm-11 box">{{ movie.imdbRating }}</div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1 box"><strong>Plot:</strong></div>
+                    <div class="col-sm-11 box">{{ movie.Plot }}</div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
