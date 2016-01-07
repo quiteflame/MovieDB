@@ -41,12 +41,20 @@ class MoviesController extends Controller {
     /**
      * @Route("/movies", name="movies")
      */
-    public function moviesAction() {
-        $repository = $this->getDoctrine()->getRepository('AppBundle:Movie');
-        $movies = $repository->findAll();
+    public function moviesAction(Request $request) {
+        $em    = $this->get('doctrine.orm.entity_manager');
+        $dql   = "SELECT movie FROM AppBundle:Movie movie";
+        $query = $em->createQuery($dql);
+
+        $paginator  = $this->get('knp_paginator');
+        $pagination = $paginator->paginate(
+            $query, /* query NOT result */
+            $request->query->getInt('page', 1)/*page number*/,
+            10/*limit per page*/
+        );
 
         return $this->render('movies/movies.html.twig', array(
-            'result' => $movies,
+            'pagination' => $pagination
         ));
     }
 
@@ -81,11 +89,16 @@ class MoviesController extends Controller {
 
         $form->handleRequest($request);
         $response = null;
+        $data = $this->get('session')->get('searchQuery');
 
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
-            $response = $this->get("http")->JSONRequest("http://www.omdbapi.com/?s=" . $form->get('title')->getData() . "&y=" . $form->get('year')->getData() . "&r=json");
+            $this->get('session')->set('searchQuery', $data);
+        }
+
+        if ($data) {
+            $response = $this->get("http")->JSONRequest("http://www.omdbapi.com/?s=" . $data->getTitle() . "&y=" . $data->getYear() . "&r=json");
 
             if (isset($response->Response) && $response->Response === 'False') {
                 $this->get('session')->getFlashBag()->add('danger', $response->Error);
@@ -119,6 +132,8 @@ class MoviesController extends Controller {
             return $this->redirectToRoute('search');
         }
 
+        $this->get('session')->remove('searchQuery');
+
         $response = $this->get("http")->JSONRequest('http://www.omdbapi.com/?i=' . $imdbID . '&plot=short&tomatoes=true&r=json');
 
         $movie = $serializer->deserialize(json_encode($response), 'AppBundle\Entity\Movie', 'json');
@@ -130,6 +145,10 @@ class MoviesController extends Controller {
 
         $this->get('session')->getFlashBag()->add('success', "Movie added successfully");
 
-        return $this->redirectToRoute('movies');
+        return $this->redirect($this->generateUrl('movies', array(
+            'page' => 1,
+            'sort' => 'movie.Id',
+            'direction' => 'desc'
+        )));
     }
 }

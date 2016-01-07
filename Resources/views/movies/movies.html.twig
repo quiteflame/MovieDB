@@ -1,7 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% for movie in result %}
+    <div class="navigation">
+        <ul class="pagination">
+            <li{% if pagination.isSorted('movie.Title') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Title'|trans, 'movie.Title') }}</li>
+            <li{% if pagination.isSorted('movie.imdbRating') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Rating'|trans, 'movie.imdbRating') }}</li>
+            <li><a>Total: {{ pagination.getTotalItemCount }}</a></li>
+        </ul>
+    </div>
+    {% for movie in pagination %}
         <div class="row bottom-buffer">
             <div class="col-sm-2 box">
                 <img class="img-responsive img-thumbnail" src="{{ movie.Poster == 'N/A' ? asset('assets/img/NA.png') : movie.Poster }}">
@@ -33,4 +40,9 @@
             </div>
         </div>
     {% endfor %}
+
+    {# display navigation #}
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
 {% endblock %}
