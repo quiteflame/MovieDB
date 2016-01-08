@@ -53,15 +53,81 @@ class MoviesController extends Controller {
             10/*limit per page*/
         );
 
+        $query = new SearchQuery();
+
+        $form = $this->createFormBuilder($query)
+            ->setMethod('POST')
+            ->setAction($this->generateUrl('search_result'))
+            ->add('title', TextType::class, array(
+                'label' => 'Title:',
+                'attr' => array(
+                    'class' => 'form-control'
+                )
+            ))
+            ->add('search_movies', SubmitType::class, array(
+                'label' => 'Search',
+                'attr' => array(
+                    'class' => 'btn btn-default'
+                )
+            ))
+            ->getForm();
+
         return $this->render('movies/movies.html.twig', array(
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'form' => $form->createView()
         ));
     }
 
     /**
-     * @Route("/movies/search", name="search")
+     * @Route("/movies/search/result", name="search_result")
      */
     public function searchMoviesAction(Request $request) {
+        $query = new SearchQuery();
+
+        $form = $this->createFormBuilder($query)
+            ->setMethod('POST')
+            ->add('title', TextType::class, array(
+                'label' => 'Title:',
+                'attr' => array(
+                    'class' => 'form-control'
+                )
+            ))
+            ->add('search_movies', SubmitType::class, array(
+                'label' => 'Search',
+                'attr' => array(
+                    'class' => 'btn btn-default'
+                )
+            ))
+            ->getForm();
+
+        $form->handleRequest($request);
+        $data = $form->getData();
+        $pagination  = null;
+
+        if($data->getTitle() !== null) {
+            $em    = $this->get('doctrine.orm.entity_manager');
+            $dql   = "SELECT movie FROM AppBundle:Movie movie WHERE movie.Title LIKE :title ORDER BY movie.Title ASC";
+            $query = $em->createQuery($dql)
+                        ->setParameter('title', '%' . $data->getTitle() . '%');
+
+            $paginator  = $this->get('knp_paginator');
+            $pagination = $paginator->paginate(
+                $query, /* query NOT result */
+                $request->query->getInt('page', 1)/*page number*/,
+                10/*limit per page*/
+            );
+        }
+
+        return $this->render('movies/search_result.html.twig', array(
+            'pagination' => $pagination,
+            'form' => $form->createView()
+        ));
+    }
+
+    /**
+     * @Route("/movies/add", name="search")
+     */
+    public function searchNewMoviesAction(Request $request) {
         $query = new SearchQuery();
 
         $form = $this->createFormBuilder($query)
