@@ -32,13 +32,6 @@ class MoviesController extends Controller {
     }
 
     /**
-     * @Route("/login", name="login")
-     */
-    public function loginAction() {
-        return $this->render('movies/login.html.twig');
-    }
-
-    /**
      * @Route("/movies", name="movies")
      */
     public function moviesAction(Request $request) {

@@ -1,6 +1,6 @@
-services:
-    http:
-        class: AppBundle\Service\Http
+imports:
+    - { resource: security.yml }
+    - { resource: services.yml }
 
 framework:
     secret: %secret%
@@ -15,6 +15,7 @@ framework:
         handler_id:  ~
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
     form: ~
+    translator: ~
 
 knp_paginator:
     page_range: 5                      # default page range used in pagination control

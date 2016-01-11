@@ -1,0 +1,36 @@
+security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    quiteflame:
+                        password: $2y$12$9zRoJP1ISZMcY8iKSGMp9e6dvDbIs.DNAy5HaMoANFS3x5Yndwtdi
+                        roles: 'ROLE_ADMIN'
+
+    firewalls:
+        main:
+            anonymous: ~
+            form_login:
+                login_path: /login
+                check_path: /login_check
+            logout:
+                path:   /logout
+                target: /
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        default:
+            anonymous: ~
+
+    access_control:
+        - { path: ^/_wdt, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/_profiler, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/movies/add, roles: ROLE_ADMIN }
+        - { path: ^/movies/search/add, roles: ROLE_ADMIN }
+
+    encoders:
+        Symfony\Component\Security\Core\User\User:
+            algorithm: bcrypt
+            cost: 12
