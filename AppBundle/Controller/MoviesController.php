@@ -32,9 +32,10 @@ class MoviesController extends Controller {
     }
 
     /**
-     * @Route("/movies", name="movies")
+     * @Route("/movies/{page}/{sort}/{direction}", name="movies", defaults={"page" = 1, "sort" = "Title", "direction" = "asc"})
      */
-    public function moviesAction(Request $request) {
+    public function moviesAction($page, $sort, $direction) {
+
         $em    = $this->get('doctrine.orm.entity_manager');
         $dql   = "SELECT movie FROM AppBundle:Movie movie";
         $query = $em->createQuery($dql);
@@ -42,8 +43,12 @@ class MoviesController extends Controller {
         $paginator  = $this->get('knp_paginator');
         $pagination = $paginator->paginate(
             $query, /* query NOT result */
-            $request->query->getInt('page', 1)/*page number*/,
-            10/*limit per page*/
+            $page/*page number*/,
+            10/*limit per page*/,
+            array(
+                'defaultSortFieldName' => array('movie.' . $sort),
+                'defaultSortDirection' => $direction
+            )
         );
 
         $query = new SearchQuery();

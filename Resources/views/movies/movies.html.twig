@@ -16,8 +16,8 @@
     </div>
     <div class="navigation">
         <ul class="pagination">
-            <li{% if pagination.isSorted('movie.Title') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Title'|trans, 'movie.Title') }}</li>
-            <li{% if pagination.isSorted('movie.imdbRating') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Rating'|trans, 'movie.imdbRating') }}</li>
+            <li{% if pagination.isSorted('Title') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Title'|trans, 'Title') }}</li>
+            <li{% if pagination.isSorted('imdbRating') %} class="active"{% endif %}>{{ knp_pagination_sortable(pagination, 'Rating'|trans, 'imdbRating') }}</li>
             <li><a>Total: {{ pagination.getTotalItemCount }}</a></li>
         </ul>
     </div>
