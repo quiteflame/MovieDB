@@ -26,11 +26,9 @@
 			{% for movie in row %}
 			    <div class="col-md-3">
 						<div class="img-add-box">
-							<img class="img-poster" src="{{ movie.Poster == 'N/A' ? asset('assets/img/NA.png') : movie.Poster }}">
-							<form class="add-movie-form" action="{{ path('add_movie') }}" method="POST">
-							   <input type="hidden" name="imdbID" value="{{movie.imdbID}}"><br />
-							   <button id="img-add-box-save" type="submit" name="submit">+</button>
-							</form>
+                            <a href="{{ path('add_movie') }}/{{movie.imdbID}}">
+							    <img class="img-poster" src="{{ movie.Poster == 'N/A' ? asset('assets/img/NA.png') : movie.Poster }}">
+                            </a>
 						</div>
 						<h5>{{ movie.Title }} ({{ movie.Year }})</h5>
 			    </div>

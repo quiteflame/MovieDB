@@ -21,14 +21,17 @@ class MoviesController extends Controller {
      * @Route("/", name="homepage")
      */
     public function indexAction() {
-        $this->get('session')->getFlashBag()->add('warning', 'Warning flash message');
-        $this->get('session')->getFlashBag()->add('info', 'Info flash message');
-        $this->get('session')->getFlashBag()->add('success', 'Success flash message');
-        $this->get('session')->getFlashBag()->add('danger', 'Danger flash message');
+        $this->get('session')->remove('searchQuery');
 
-        return $this->render('movies/index.html.twig', array(
-            'quote' => 'Karol'
-        ));
+        // $this->get('session')->getFlashBag()->add('warning', 'Warning flash message');
+        // $this->get('session')->getFlashBag()->add('info', 'Info flash message');
+        // $this->get('session')->getFlashBag()->add('success', 'Success flash message');
+        // $this->get('session')->getFlashBag()->add('danger', 'Danger flash message');
+
+        // return $this->render('movies/index.html.twig', array(
+        //     'quote' => 'Karol'
+        // ));
+        return $this->redirectToRoute('movies');
     }
 
     /**
@@ -46,6 +49,7 @@ class MoviesController extends Controller {
      *)
      */
     public function moviesAction($page, $sort, $direction) {
+        $this->get('session')->remove('searchQuery');
 
         $em    = $this->get('doctrine.orm.entity_manager');
         $dql   = "SELECT movie FROM AppBundle:Movie movie";
@@ -91,6 +95,8 @@ class MoviesController extends Controller {
      * @Route("/movies/search/result", name="search_result")
      */
     public function searchMoviesAction(Request $request) {
+        $this->get('session')->remove('searchQuery');
+
         $query = new SearchQuery();
 
         $form = $this->createFormBuilder($query)
@@ -173,12 +179,15 @@ class MoviesController extends Controller {
         }
 
         if ($data) {
-            $response = $this->get("http")->JSONRequest("http://www.omdbapi.com/?s=" . $data->getTitle() . "&y=" . $data->getYear() . "&r=json");
+            $url = "http://www.omdbapi.com/?s=" . urlencode($data->getTitle()) . "&y=" . urlencode($data->getYear()) . "&r=json";
+            $response = $this->get("http")->JSONRequest($url);
 
             if (isset($response->Response) && $response->Response === 'False') {
                 $this->get('session')->getFlashBag()->add('danger', $response->Error);
                 $response = null;
             }
+
+            dump($url);
         }
 
         return $this->render('movies/search.html.twig', array(
@@ -188,14 +197,12 @@ class MoviesController extends Controller {
     }
 
     /**
-     * @Route("/movies/search/add", name="add_movie")
+     * @Route("/movies/search/add/{imdbID}", name="add_movie", defaults={"imdbID" = null})
      */
-    public function addMovieAction(Request $request) {
+    public function addMovieAction($imdbID) {
         $encoders = array(new JsonEncoder());
         $normalizers = array(new ObjectNormalizer());
         $serializer = new Serializer($normalizers, $encoders);
-
-        $imdbID = $request->request->get('imdbID');
 
         $repository = $this->getDoctrine()->getRepository('AppBundle:Movie');
         $product = $repository->findOneBy(
@@ -207,23 +214,16 @@ class MoviesController extends Controller {
             return $this->redirectToRoute('search');
         }
 
-        $this->get('session')->remove('searchQuery');
-
         $response = $this->get("http")->JSONRequest('http://www.omdbapi.com/?i=' . $imdbID . '&plot=short&tomatoes=true&r=json');
 
         $movie = $serializer->deserialize(json_encode($response), 'AppBundle\Entity\Movie', 'json');
 
         $em = $this->getDoctrine()->getManager();
-
         $em->persist($movie);
         $em->flush();
 
         $this->get('session')->getFlashBag()->add('success', "Movie added successfully");
 
-        return $this->redirect($this->generateUrl('movies', array(
-            'page' => 1,
-            'sort' => 'movie.Id',
-            'direction' => 'desc'
-        )));
+        return $this->redirectToRoute('search');
     }
 }
