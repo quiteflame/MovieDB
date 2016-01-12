@@ -32,7 +32,18 @@ class MoviesController extends Controller {
     }
 
     /**
-     * @Route("/movies/{page}/{sort}/{direction}", name="movies", defaults={"page" = 1, "sort" = "Title", "direction" = "asc"})
+     * @Route(
+     *      "/movies/{page}/{sort}/{direction}",
+     *      name="movies",
+     *      defaults={
+     *          "page" = 1,
+     *          "sort" = "Title",
+     *          "direction" = "asc"
+     *      },
+     *     requirements={
+     *         "page": "\d+"
+     *     }
+     *)
      */
     public function moviesAction($page, $sort, $direction) {
 
